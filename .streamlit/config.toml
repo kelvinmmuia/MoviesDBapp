@@ -1,0 +1,11 @@
+[theme]
+base = "light"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F0F2F6"
+textColor = "#31333F"
+primaryColor = "#2962FF"
+
+[theme.semanticColors]
+success = "#4CAF50"
+warning = "#FF9800"
+error = "#D32F2F"

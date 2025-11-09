@@ -702,31 +702,6 @@ GROUP BY g.Category;""",
                 language="sql"
             )
 
-    # Blocked operations examples
-    with st.expander("🚫 Blocked Operations (Click to test)", expanded=False):
-        st.markdown("**These operations are blocked for security. Try them to see the error message:**")
-
-        blocked_queries = {
-            "DROP TABLE": "DROP TABLE Movie;",
-            "DELETE records": "DELETE FROM Movie WHERE Movie_id = 121798;",
-            "UPDATE records": "UPDATE Movie SET Title = 'New Title' WHERE Movie_id = 121798;",
-            "INSERT records": "INSERT INTO Movie VALUES (999999, 'Test Movie', 2024);",
-            "ALTER TABLE": "ALTER TABLE Movie ADD COLUMN Test VARCHAR(50);",
-            "CREATE TABLE": "CREATE TABLE Test (id INTEGER PRIMARY KEY, name TEXT);",
-            "TRUNCATE TABLE": "DELETE FROM Movie;"  # TRUNCATE not supported in SQLite, but DELETE FROM is blocked
-        }
-
-        cols = st.columns(2)
-        for i, (operation, query) in enumerate(blocked_queries.items()):
-            with cols[i % 2]:
-                if st.button(f"🚫 Test {operation}", key=f"blocked_{i}"):
-                    st.code(query, language="sql")
-                    st.markdown(f"""
-                    <div class="error-message">
-                        ❌ <strong>Query contains forbidden keyword: {operation.split()[0]}</strong>
-                    </div>
-                    """, unsafe_allow_html=True)
-
     # query input
     query = st.text_area("Enter your SQL query:", height=150,
                         placeholder="SELECT * FROM Movie WHERE Release_year > 2000;",

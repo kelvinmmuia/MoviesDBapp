@@ -130,7 +130,8 @@ def main():
     menu_options = {
         "🏠 Home": "Home",
         "➕ Add Data": "Add Data",
-        "🗑️ Delete Data": "Delete Data",
+        "📝 Update Data": "Update Data",
+        "️ Delete Data": "Delete Data",
         "🔍 Search Movies": "Search Movies",
         "📊 View Data": "View Data",
         "⚡ SQL Query Tool": "SQL Query Tool"
@@ -143,6 +144,8 @@ def main():
         show_home()
     elif choice == "Add Data":
         show_add_data()
+    elif choice == "Update Data":
+        show_update_data()
     elif choice == "Delete Data":
         show_delete_data()
     elif choice == "Search Movies":
@@ -930,6 +933,479 @@ def show_delete_directed_by_form():
                 st.rerun()
             else:
                 st.error("Failed to remove relationship. Check if relationship exists.")
+
+def show_update_data():
+    """show forms to update data in tables"""
+    st.markdown("## 📝 Update Data")
+    st.markdown("Select a table below to update existing records in your movie database.")
+
+    table_options = {
+        "🎭 Actor": "Actor",
+        "🎬 Director": "Director",
+        "🏷️ Genre": "Genre",
+        "🎪 Movie": "Movie",
+        "⭐ Review": "Review",
+        "👤 User": "User"
+    }
+
+    table_choice = st.selectbox("Select Table to Update:", list(table_options.keys()))
+    table = table_options[table_choice]
+
+    if table == "Actor":
+        show_update_actor_form()
+    elif table == "Director":
+        show_update_director_form()
+    elif table == "Genre":
+        show_update_genre_form()
+    elif table == "Movie":
+        show_update_movie_form()
+    elif table == "Review":
+        show_update_review_form()
+    elif table == "User":
+        show_update_user_form()
+
+def show_update_actor_form():
+    """form to update actor"""
+    st.markdown("### 📝 Update Actor")
+    st.markdown("---")
+
+    # Get existing actors for selection
+    actors = get_table_data("Actor")
+    if not actors:
+        st.markdown("""
+        <div class="info-message">
+            ℹ️ No actors found in the database. Add some actors first.
+        </div>
+        """, unsafe_allow_html=True)
+        return
+
+    actor_options = {f"{a['First_name']} {a['Last_name']} (ID: {a['Actor_id']})": a['Actor_id'] for a in actors}
+    selected_actor = st.selectbox("Select Actor to Update:", list(actor_options.keys()))
+    actor_id = actor_options[selected_actor]
+
+    # Get current actor data
+    current_actor = next((a for a in actors if a['Actor_id'] == actor_id), None)
+    if not current_actor:
+        st.error("Actor not found.")
+        return
+
+    with st.form(f"update_actor_{actor_id}"):
+        st.markdown("**Current Values:**")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.info(f"First Name: {current_actor['First_name']}")
+        with col2:
+            st.info(f"Last Name: {current_actor['Last_name']}")
+
+        st.markdown("**New Values:**")
+        new_first_name = st.text_input("First Name", value=current_actor['First_name'], placeholder="e.g., John (max 45 chars)", help="Enter the actor's first name")
+        new_last_name = st.text_input("Last Name", value=current_actor['Last_name'], placeholder="e.g., Doe (max 45 chars)", help="Enter the actor's last name")
+
+        col1, col2, col3 = st.columns([1, 1, 2])
+        with col1:
+            submitted = st.form_submit_button("✅ Update Actor", use_container_width=True)
+
+        if submitted:
+            if new_first_name.strip() and new_last_name.strip():
+                result = update_actor(actor_id, new_first_name.strip(), new_last_name.strip())
+                if isinstance(result, tuple):
+                    success, error_msg = result
+                    if success:
+                        st.markdown("""
+                        <div class="success-message">
+                            ✅ <strong>Actor updated successfully!</strong>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        st.balloons()
+                        time.sleep(1)
+                        st.rerun()
+                    else:
+                        st.markdown(f"""
+                        <div class="error-message">
+                            ❌ <strong>Failed to update actor:</strong> {error_msg}
+                        </div>
+                        """, unsafe_allow_html=True)
+                else:
+                    st.markdown("""
+                    <div class="success-message">
+                        ✅ <strong>Actor updated successfully!</strong>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    st.balloons()
+                    time.sleep(1)
+                    st.rerun()
+            else:
+                st.markdown("""
+                <div class="warning-message">
+                    ⚠️ <strong>Please fill in both first name and last name.</strong>
+                </div>
+                """, unsafe_allow_html=True)
+
+def show_update_director_form():
+    """form to update director"""
+    st.markdown("### 📝 Update Director")
+    st.markdown("---")
+
+    directors = get_table_data("Director")
+    if not directors:
+        st.markdown("""
+        <div class="info-message">
+            ℹ️ No directors found in the database. Add some directors first.
+        </div>
+        """, unsafe_allow_html=True)
+        return
+
+    director_options = {f"{d['First_name']} {d['Last_name']} (ID: {d['Director_id']})": d['Director_id'] for d in directors}
+    selected_director = st.selectbox("Select Director to Update:", list(director_options.keys()))
+    director_id = director_options[selected_director]
+
+    current_director = next((d for d in directors if d['Director_id'] == director_id), None)
+    if not current_director:
+        st.error("Director not found.")
+        return
+
+    with st.form(f"update_director_{director_id}"):
+        st.markdown("**Current Values:**")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.info(f"First Name: {current_director['First_name']}")
+        with col2:
+            st.info(f"Last Name: {current_director['Last_name']}")
+
+        st.markdown("**New Values:**")
+        new_first_name = st.text_input("First Name", value=current_director['First_name'], placeholder="e.g., Christopher (max 45 chars)", help="Enter the director's first name")
+        new_last_name = st.text_input("Last Name", value=current_director['Last_name'], placeholder="e.g., Nolan (max 45 chars)", help="Enter the director's last name")
+
+        col1, col2, col3 = st.columns([1, 1, 2])
+        with col1:
+            submitted = st.form_submit_button("✅ Update Director", use_container_width=True)
+
+        if submitted:
+            if new_first_name.strip() and new_last_name.strip():
+                result = update_director(director_id, new_first_name.strip(), new_last_name.strip())
+                if isinstance(result, tuple):
+                    success, error_msg = result
+                    if success:
+                        st.markdown("""
+                        <div class="success-message">
+                            ✅ <strong>Director updated successfully!</strong>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        st.balloons()
+                        time.sleep(1)
+                        st.rerun()
+                    else:
+                        st.markdown(f"""
+                        <div class="error-message">
+                            ❌ <strong>Failed to update director:</strong> {error_msg}
+                        </div>
+                        """, unsafe_allow_html=True)
+                else:
+                    st.markdown("""
+                    <div class="success-message">
+                        ✅ <strong>Director updated successfully!</strong>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    st.balloons()
+                    time.sleep(1)
+                    st.rerun()
+            else:
+                st.markdown("""
+                <div class="warning-message">
+                    ⚠️ <strong>Please fill in both first name and last name.</strong>
+                </div>
+                """, unsafe_allow_html=True)
+
+def show_update_genre_form():
+    """form to update genre"""
+    st.markdown("### 📝 Update Genre")
+    st.markdown("---")
+
+    genres = get_table_data("Genre")
+    if not genres:
+        st.markdown("""
+        <div class="info-message">
+            ℹ️ No genres found in the database. Add some genres first.
+        </div>
+        """, unsafe_allow_html=True)
+        return
+
+    genre_options = {f"{g['Category']} (ID: {g['Genre_id']})": g['Genre_id'] for g in genres}
+    selected_genre = st.selectbox("Select Genre to Update:", list(genre_options.keys()))
+    genre_id = genre_options[selected_genre]
+
+    current_genre = next((g for g in genres if g['Genre_id'] == genre_id), None)
+    if not current_genre:
+        st.error("Genre not found.")
+        return
+
+    with st.form(f"update_genre_{genre_id}"):
+        st.markdown("**Current Value:**")
+        st.info(f"Category: {current_genre['Category']}")
+
+        st.markdown("**New Value:**")
+        new_category = st.text_input("Category", value=current_genre['Category'], placeholder="e.g., Science Fiction (max 45 chars)", help="Enter the genre category")
+
+        col1, col2, col3 = st.columns([1, 1, 2])
+        with col1:
+            submitted = st.form_submit_button("✅ Update Genre", use_container_width=True)
+
+        if submitted:
+            if new_category.strip():
+                result = update_genre(genre_id, new_category.strip())
+                if isinstance(result, tuple):
+                    success, error_msg = result
+                    if success:
+                        st.markdown("""
+                        <div class="success-message">
+                            ✅ <strong>Genre updated successfully!</strong>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        st.balloons()
+                        time.sleep(1)
+                        st.rerun()
+                    else:
+                        st.markdown(f"""
+                        <div class="error-message">
+                            ❌ <strong>Failed to update genre:</strong> {error_msg}
+                        </div>
+                        """, unsafe_allow_html=True)
+                else:
+                    st.markdown("""
+                    <div class="success-message">
+                        ✅ <strong>Genre updated successfully!</strong>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    st.balloons()
+                    time.sleep(1)
+                    st.rerun()
+            else:
+                st.markdown("""
+                <div class="warning-message">
+                    ⚠️ <strong>Please enter a category.</strong>
+                </div>
+                """, unsafe_allow_html=True)
+
+def show_update_movie_form():
+    """form to update movie"""
+    st.markdown("### 📝 Update Movie")
+    st.markdown("---")
+
+    movies = get_table_data("Movie")
+    if not movies:
+        st.markdown("""
+        <div class="info-message">
+            ℹ️ No movies found in the database. Add some movies first.
+        </div>
+        """, unsafe_allow_html=True)
+        return
+
+    movie_options = {f"{m['Title']} ({m['Release_year']}) (ID: {m['Movie_id']})": m['Movie_id'] for m in movies}
+    selected_movie = st.selectbox("Select Movie to Update:", list(movie_options.keys()))
+    movie_id = movie_options[selected_movie]
+
+    current_movie = next((m for m in movies if m['Movie_id'] == movie_id), None)
+    if not current_movie:
+        st.error("Movie not found.")
+        return
+
+    with st.form(f"update_movie_{movie_id}"):
+        st.markdown("**Current Values:**")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.info(f"Title: {current_movie['Title']}")
+        with col2:
+            st.info(f"Release Year: {current_movie['Release_year']}")
+
+        st.markdown("**New Values:**")
+        new_title = st.text_input("Title", value=current_movie['Title'], placeholder="e.g., Inception (max 45 chars)", help="Enter the movie title")
+        new_year = st.number_input("Release Year", value=current_movie['Release_year'], min_value=1900, max_value=2030, step=1, placeholder="e.g., 2010 (1900-2030)", help="Enter the release year")
+
+        col1, col2, col3 = st.columns([1, 1, 2])
+        with col1:
+            submitted = st.form_submit_button("✅ Update Movie", use_container_width=True)
+
+        if submitted:
+            if new_title.strip():
+                result = update_movie(movie_id, new_title.strip(), new_year)
+                if isinstance(result, tuple):
+                    success, error_msg = result
+                    if success:
+                        st.markdown("""
+                        <div class="success-message">
+                            ✅ <strong>Movie updated successfully!</strong>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        st.balloons()
+                        time.sleep(1)
+                        st.rerun()
+                    else:
+                        st.markdown(f"""
+                        <div class="error-message">
+                            ❌ <strong>Failed to update movie:</strong> {error_msg}
+                        </div>
+                        """, unsafe_allow_html=True)
+                else:
+                    st.markdown("""
+                    <div class="success-message">
+                        ✅ <strong>Movie updated successfully!</strong>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    st.balloons()
+                    time.sleep(1)
+                    st.rerun()
+            else:
+                st.markdown("""
+                <div class="warning-message">
+                    ⚠️ <strong>Please enter a title.</strong>
+                </div>
+                """, unsafe_allow_html=True)
+
+def show_update_review_form():
+    """form to update review"""
+    st.markdown("### 📝 Update Review")
+    st.markdown("---")
+
+    reviews = get_table_data("Review")
+    if not reviews:
+        st.markdown("""
+        <div class="info-message">
+            ℹ️ No reviews found in the database. Add some reviews first.
+        </div>
+        """, unsafe_allow_html=True)
+        return
+
+    # Get movie titles for better display
+    movies = get_table_data("Movie")
+    movie_dict = {m['Movie_id']: m['Title'] for m in movies} if movies else {}
+
+    review_options = {f"Review ID {r['Review_id']} - Movie: {movie_dict.get(r['Movie_Movie_id'], f'ID {r['Movie_Movie_id']}')} - Rating: {r['Rating']}": r['Review_id'] for r in reviews}
+    selected_review = st.selectbox("Select Review to Update:", list(review_options.keys()))
+    review_id = review_options[selected_review]
+
+    current_review = next((r for r in reviews if r['Review_id'] == review_id), None)
+    if not current_review:
+        st.error("Review not found.")
+        return
+
+    with st.form(f"update_review_{review_id}"):
+        st.markdown("**Current Values:**")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.info(f"Rating: {current_review['Rating']}")
+        with col2:
+            st.info(f"Movie ID: {current_review['Movie_Movie_id']}")
+
+        st.markdown("**New Values:**")
+        new_rating = st.slider("Rating", min_value=1, max_value=100, value=current_review['Rating'], step=1, help="Rate from 1-100")
+        new_movie_id = st.number_input("Movie ID", value=current_review['Movie_Movie_id'], min_value=1, step=1, placeholder="e.g., 12345 (existing movie ID)", help="Enter the movie ID")
+
+        col1, col2, col3 = st.columns([1, 1, 2])
+        with col1:
+            submitted = st.form_submit_button("✅ Update Review", use_container_width=True)
+
+        if submitted:
+            result = update_review(review_id, new_rating, new_movie_id)
+            if isinstance(result, tuple):
+                success, error_msg = result
+                if success:
+                    st.markdown("""
+                    <div class="success-message">
+                        ✅ <strong>Review updated successfully!</strong>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    st.balloons()
+                    time.sleep(1)
+                    st.rerun()
+                else:
+                    st.markdown(f"""
+                    <div class="error-message">
+                        ❌ <strong>Failed to update review:</strong> {error_msg}
+                    </div>
+                    """, unsafe_allow_html=True)
+            else:
+                st.markdown("""
+                <div class="success-message">
+                    ✅ <strong>Review updated successfully!</strong>
+                </div>
+                """, unsafe_allow_html=True)
+                st.balloons()
+                time.sleep(1)
+                st.rerun()
+
+def show_update_user_form():
+    """form to update user"""
+    st.markdown("### 📝 Update User")
+    st.markdown("---")
+
+    users = get_table_data("User")
+    if not users:
+        st.markdown("""
+        <div class="info-message">
+            ℹ️ No users found in the database. Add some users first.
+        </div>
+        """, unsafe_allow_html=True)
+        return
+
+    user_options = {f"{u['User_id']} - {u['email']}": u['User_id'] for u in users}
+    selected_user = st.selectbox("Select User to Update:", list(user_options.keys()))
+    user_id = selected_user.split(' - ')[0]  # Extract user_id from the display string
+
+    current_user = next((u for u in users if u['User_id'] == user_id), None)
+    if not current_user:
+        st.error("User not found.")
+        return
+
+    with st.form(f"update_user_{user_id}"):
+        st.markdown("**Current Values:**")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.info(f"User ID: {current_user['User_id']}")
+        with col2:
+            st.info(f"Email: {current_user['email']}")
+
+        st.markdown("**New Values:**")
+        new_email = st.text_input("Email", value=current_user['email'], placeholder="e.g., newemail@example.com (max 45 chars)", help="Enter the user's email address")
+
+        col1, col2, col3 = st.columns([1, 1, 2])
+        with col1:
+            submitted = st.form_submit_button("✅ Update User", use_container_width=True)
+
+        if submitted:
+            if new_email.strip():
+                result = update_user(user_id, new_email.strip())
+                if isinstance(result, tuple):
+                    success, error_msg = result
+                    if success:
+                        st.markdown("""
+                        <div class="success-message">
+                            ✅ <strong>User updated successfully!</strong>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        st.balloons()
+                        time.sleep(1)
+                        st.rerun()
+                    else:
+                        st.markdown(f"""
+                        <div class="error-message">
+                            ❌ <strong>Failed to update user:</strong> {error_msg}
+                        </div>
+                        """, unsafe_allow_html=True)
+                else:
+                    st.markdown("""
+                    <div class="success-message">
+                        ✅ <strong>User updated successfully!</strong>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    st.balloons()
+                    time.sleep(1)
+                    st.rerun()
+            else:
+                st.markdown("""
+                <div class="warning-message">
+                    ⚠️ <strong>Please enter an email address.</strong>
+                </div>
+                """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()

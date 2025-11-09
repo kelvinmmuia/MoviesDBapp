@@ -364,6 +364,117 @@ def delete_directed_by(movie_id, director_id):
     query = "DELETE FROM Directed_by WHERE Movie_Movie_id = ? AND Director_Director_id = ?"
     return execute_query(query, (movie_id, director_id))
 
+def update_actor(actor_id, first_name, last_name):
+    """update actor by id"""
+    # Validate inputs
+    try:
+        actor_id = int(actor_id)
+        if actor_id <= 0:
+            return False, "Actor ID must be a positive integer"
+        if not first_name.strip() or not last_name.strip():
+            return False, "First name and last name cannot be empty"
+        if len(first_name.strip()) > 45 or len(last_name.strip()) > 45:
+            return False, "Names cannot exceed 45 characters"
+    except ValueError:
+        return False, "Actor ID must be a valid integer"
+
+    query = "UPDATE Actor SET First_name = ?, Last_name = ? WHERE Actor_id = ?"
+    result = execute_query(query, (first_name.strip(), last_name.strip(), actor_id))
+    return result
+
+def update_director(director_id, first_name, last_name):
+    """update director by id"""
+    # Validate inputs
+    try:
+        director_id = int(director_id)
+        if director_id <= 0:
+            return False, "Director ID must be a positive integer"
+        if not first_name.strip() or not last_name.strip():
+            return False, "First name and last name cannot be empty"
+        if len(first_name.strip()) > 45 or len(last_name.strip()) > 45:
+            return False, "Names cannot exceed 45 characters"
+    except ValueError:
+        return False, "Director ID must be a valid integer"
+
+    query = "UPDATE Director SET First_name = ?, Last_name = ? WHERE Director_id = ?"
+    result = execute_query(query, (first_name.strip(), last_name.strip(), director_id))
+    return result
+
+def update_genre(genre_id, category):
+    """update genre by id"""
+    # Validate inputs
+    try:
+        genre_id = int(genre_id)
+        if genre_id <= 0:
+            return False, "Genre ID must be a positive integer"
+        if not category.strip():
+            return False, "Category cannot be empty"
+        if len(category.strip()) > 45:
+            return False, "Category cannot exceed 45 characters"
+    except ValueError:
+        return False, "Genre ID must be a valid integer"
+
+    query = "UPDATE Genre SET Category = ? WHERE Genre_id = ?"
+    result = execute_query(query, (category.strip(), genre_id))
+    return result
+
+def update_movie(movie_id, title, release_year):
+    """update movie by id"""
+    # Validate inputs
+    try:
+        movie_id = int(movie_id)
+        release_year = int(release_year)
+        if movie_id <= 0:
+            return False, "Movie ID must be a positive integer"
+        if not title.strip():
+            return False, "Title cannot be empty"
+        if len(title.strip()) > 45:
+            return False, "Title cannot exceed 45 characters"
+        if release_year < 1900 or release_year > 2030:
+            return False, "Release year must be between 1900 and 2030"
+    except ValueError:
+        return False, "Movie ID and Release Year must be valid integers"
+
+    query = "UPDATE Movie SET Title = ?, Release_year = ? WHERE Movie_id = ?"
+    result = execute_query(query, (title.strip(), release_year, movie_id))
+    return result
+
+def update_review(review_id, rating, movie_id):
+    """update review by id"""
+    # Validate inputs
+    try:
+        review_id = int(review_id)
+        rating = int(rating)
+        movie_id = int(movie_id)
+        if review_id <= 0:
+            return False, "Review ID must be a positive integer"
+        if rating < 1 or rating > 100:
+            return False, "Rating must be between 1 and 100"
+        if movie_id <= 0:
+            return False, "Movie ID must be a positive integer"
+    except ValueError:
+        return False, "Review ID, Rating, and Movie ID must be valid integers"
+
+    query = "UPDATE Review SET Rating = ?, Movie_Movie_id = ? WHERE Review_id = ?"
+    result = execute_query(query, (rating, movie_id, review_id))
+    return result
+
+def update_user(user_id, email):
+    """update user by id"""
+    # Validate inputs
+    if not user_id.strip():
+        return False, "User ID cannot be empty"
+    if not email.strip():
+        return False, "Email cannot be empty"
+    if len(email.strip()) > 45:
+        return False, "Email cannot exceed 45 characters"
+    if '@' not in email or '.' not in email:
+        return False, "Email must be in valid format (contain @ and .)"
+
+    query = "UPDATE User SET email = ? WHERE User_id = ?"
+    result = execute_query(query, (email.strip(), user_id.strip()))
+    return result
+
 def execute_custom_query(sql_query):
     """execute custom sql query and return dataframe"""
     # basic validation - reject dangerous keywords

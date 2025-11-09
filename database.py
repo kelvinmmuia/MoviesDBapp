@@ -20,10 +20,10 @@ def execute_query(query, params=None):
                 rows = cursor.fetchall()
                 return [dict(zip(columns, row)) for row in rows]
             conn.commit()
-            return True
+            return True, None
     except Exception as e:
         print(f"Database error: {e}")
-        return None
+        return False, str(e)
 
 def get_table_data(table_name):
     """get all data from a table"""
@@ -32,48 +32,165 @@ def get_table_data(table_name):
 
 def insert_actor(actor_id, first_name, last_name):
     """insert new actor"""
+    # Validate inputs
+    try:
+        actor_id = int(actor_id)
+        if actor_id <= 0:
+            return False, "Actor ID must be a positive integer"
+        if not first_name.strip() or not last_name.strip():
+            return False, "First name and last name cannot be empty"
+        if len(first_name.strip()) > 45 or len(last_name.strip()) > 45:
+            return False, "Names cannot exceed 45 characters"
+    except ValueError:
+        return False, "Actor ID must be a valid integer"
+
     query = "INSERT INTO Actor (Actor_id, First_name, Last_name) VALUES (?, ?, ?)"
-    return execute_query(query, (actor_id, first_name, last_name))
+    result = execute_query(query, (actor_id, first_name.strip(), last_name.strip()))
+    return result
 
 def insert_director(director_id, first_name, last_name):
     """insert new director"""
+    # Validate inputs
+    try:
+        director_id = int(director_id)
+        if director_id <= 0:
+            return False, "Director ID must be a positive integer"
+        if not first_name.strip() or not last_name.strip():
+            return False, "First name and last name cannot be empty"
+        if len(first_name.strip()) > 45 or len(last_name.strip()) > 45:
+            return False, "Names cannot exceed 45 characters"
+    except ValueError:
+        return False, "Director ID must be a valid integer"
+
     query = "INSERT INTO Director (Director_id, First_name, Last_name) VALUES (?, ?, ?)"
-    return execute_query(query, (director_id, first_name, last_name))
+    result = execute_query(query, (director_id, first_name.strip(), last_name.strip()))
+    return result
 
 def insert_genre(genre_id, category):
     """insert new genre"""
+    # Validate inputs
+    try:
+        genre_id = int(genre_id)
+        if genre_id <= 0:
+            return False, "Genre ID must be a positive integer"
+        if not category.strip():
+            return False, "Category cannot be empty"
+        if len(category.strip()) > 45:
+            return False, "Category cannot exceed 45 characters"
+    except ValueError:
+        return False, "Genre ID must be a valid integer"
+
     query = "INSERT INTO Genre (Genre_id, Category) VALUES (?, ?)"
-    return execute_query(query, (genre_id, category))
+    result = execute_query(query, (genre_id, category.strip()))
+    return result
 
 def insert_movie(movie_id, title, release_year):
     """insert new movie"""
+    # Validate inputs
+    try:
+        movie_id = int(movie_id)
+        release_year = int(release_year)
+        if movie_id <= 0:
+            return False, "Movie ID must be a positive integer"
+        if not title.strip():
+            return False, "Title cannot be empty"
+        if len(title.strip()) > 45:
+            return False, "Title cannot exceed 45 characters"
+        if release_year < 1900 or release_year > 2030:
+            return False, "Release year must be between 1900 and 2030"
+    except ValueError:
+        return False, "Movie ID and Release Year must be valid integers"
+
     query = "INSERT INTO Movie (Movie_id, Title, Release_year) VALUES (?, ?, ?)"
-    return execute_query(query, (movie_id, title, release_year))
+    result = execute_query(query, (movie_id, title.strip(), release_year))
+    return result
 
 def insert_review(review_id, rating, movie_id):
     """insert new review"""
+    # Validate inputs
+    try:
+        review_id = int(review_id)
+        rating = int(rating)
+        movie_id = int(movie_id)
+        if review_id <= 0:
+            return False, "Review ID must be a positive integer"
+        if rating < 1 or rating > 100:
+            return False, "Rating must be between 1 and 100"
+        if movie_id <= 0:
+            return False, "Movie ID must be a positive integer"
+    except ValueError:
+        return False, "Review ID, Rating, and Movie ID must be valid integers"
+
     query = "INSERT INTO Review (Review_id, Rating, Movie_Movie_id) VALUES (?, ?, ?)"
-    return execute_query(query, (review_id, rating, movie_id))
+    result = execute_query(query, (review_id, rating, movie_id))
+    return result
 
 def insert_user(user_id, email, review_id):
     """insert new user"""
+    # Validate inputs
+    try:
+        review_id = int(review_id)
+        if not user_id.strip():
+            return False, "User ID cannot be empty"
+        if not email.strip():
+            return False, "Email cannot be empty"
+        if len(user_id.strip()) > 25:
+            return False, "User ID cannot exceed 25 characters"
+        if len(email.strip()) > 45:
+            return False, "Email cannot exceed 45 characters"
+        if '@' not in email or '.' not in email:
+            return False, "Email must be in valid format (contain @ and .)"
+    except ValueError:
+        return False, "Review ID must be a valid integer"
+
     query = "INSERT INTO User (User_id, email, Review_Review_id) VALUES (?, ?, ?)"
-    return execute_query(query, (user_id, email, review_id))
+    result = execute_query(query, (user_id.strip(), email.strip(), review_id))
+    return result
 
 def insert_acts_in(actor_id, movie_id):
     """insert actor-movie relationship"""
+    # Validate inputs
+    try:
+        actor_id = int(actor_id)
+        movie_id = int(movie_id)
+        if actor_id <= 0 or movie_id <= 0:
+            return False, "Actor ID and Movie ID must be positive integers"
+    except ValueError:
+        return False, "Actor ID and Movie ID must be valid integers"
+
     query = "INSERT INTO Acts_in (Actor_Actor_id, Movie_Movie_id) VALUES (?, ?)"
-    return execute_query(query, (actor_id, movie_id))
+    result = execute_query(query, (actor_id, movie_id))
+    return result
 
 def insert_belongs_to(genre_id, movie_id):
     """insert genre-movie relationship"""
+    # Validate inputs
+    try:
+        genre_id = int(genre_id)
+        movie_id = int(movie_id)
+        if genre_id <= 0 or movie_id <= 0:
+            return False, "Genre ID and Movie ID must be positive integers"
+    except ValueError:
+        return False, "Genre ID and Movie ID must be valid integers"
+
     query = "INSERT INTO Belongs_to (Genre_Genre_id, Movie_Movie_id) VALUES (?, ?)"
-    return execute_query(query, (genre_id, movie_id))
+    result = execute_query(query, (genre_id, movie_id))
+    return result
 
 def insert_directed_by(movie_id, director_id):
     """insert director-movie relationship"""
+    # Validate inputs
+    try:
+        movie_id = int(movie_id)
+        director_id = int(director_id)
+        if movie_id <= 0 or director_id <= 0:
+            return False, "Movie ID and Director ID must be positive integers"
+    except ValueError:
+        return False, "Movie ID and Director ID must be valid integers"
+
     query = "INSERT INTO Directed_by (Movie_Movie_id, Director_Director_id) VALUES (?, ?)"
-    return execute_query(query, (movie_id, director_id))
+    result = execute_query(query, (movie_id, director_id))
+    return result
 
 def search_movies_by_title(title):
     """search movies by title"""
@@ -107,6 +224,14 @@ def search_movies_by_genre(genre):
 
 def delete_actor(actor_id):
     """delete actor by id"""
+    # Validate input
+    try:
+        actor_id = int(actor_id)
+        if actor_id <= 0:
+            return False, "Actor ID must be a positive integer"
+    except ValueError:
+        return False, "Actor ID must be a valid integer"
+
     # First delete related records from junction tables
     query1 = "DELETE FROM Acts_in WHERE Actor_Actor_id = ?"
     execute_query(query1, (actor_id,))
@@ -116,6 +241,14 @@ def delete_actor(actor_id):
 
 def delete_director(director_id):
     """delete director by id"""
+    # Validate input
+    try:
+        director_id = int(director_id)
+        if director_id <= 0:
+            return False, "Director ID must be a positive integer"
+    except ValueError:
+        return False, "Director ID must be a valid integer"
+
     # First delete related records from junction tables
     query1 = "DELETE FROM Directed_by WHERE Director_Director_id = ?"
     execute_query(query1, (director_id,))
@@ -125,6 +258,14 @@ def delete_director(director_id):
 
 def delete_genre(genre_id):
     """delete genre by id"""
+    # Validate input
+    try:
+        genre_id = int(genre_id)
+        if genre_id <= 0:
+            return False, "Genre ID must be a positive integer"
+    except ValueError:
+        return False, "Genre ID must be a valid integer"
+
     # First delete related records from junction tables
     query1 = "DELETE FROM Belongs_to WHERE Genre_Genre_id = ?"
     execute_query(query1, (genre_id,))
@@ -134,6 +275,14 @@ def delete_genre(genre_id):
 
 def delete_movie(movie_id):
     """delete movie by id"""
+    # Validate input
+    try:
+        movie_id = int(movie_id)
+        if movie_id <= 0:
+            return False, "Movie ID must be a positive integer"
+    except ValueError:
+        return False, "Movie ID must be a valid integer"
+
     # First delete related records from junction tables
     query1 = "DELETE FROM Acts_in WHERE Movie_Movie_id = ?"
     execute_query(query1, (movie_id,))
@@ -149,6 +298,14 @@ def delete_movie(movie_id):
 
 def delete_review(review_id):
     """delete review by id"""
+    # Validate input
+    try:
+        review_id = int(review_id)
+        if review_id <= 0:
+            return False, "Review ID must be a positive integer"
+    except ValueError:
+        return False, "Review ID must be a valid integer"
+
     # First delete related records from User table
     query1 = "DELETE FROM User WHERE Review_Review_id = ?"
     execute_query(query1, (review_id,))
@@ -158,21 +315,52 @@ def delete_review(review_id):
 
 def delete_user(user_id):
     """delete user by id"""
+    # Validate input
+    if not user_id.strip():
+        return False, "User ID cannot be empty"
+
     query = "DELETE FROM User WHERE User_id = ?"
-    return execute_query(query, (user_id,))
+    return execute_query(query, (user_id.strip(),))
 
 def delete_acts_in(actor_id, movie_id):
     """delete actor-movie relationship"""
+    # Validate inputs
+    try:
+        actor_id = int(actor_id)
+        movie_id = int(movie_id)
+        if actor_id <= 0 or movie_id <= 0:
+            return False, "Actor ID and Movie ID must be positive integers"
+    except ValueError:
+        return False, "Actor ID and Movie ID must be valid integers"
+
     query = "DELETE FROM Acts_in WHERE Actor_Actor_id = ? AND Movie_Movie_id = ?"
     return execute_query(query, (actor_id, movie_id))
 
 def delete_belongs_to(genre_id, movie_id):
     """delete genre-movie relationship"""
+    # Validate inputs
+    try:
+        genre_id = int(genre_id)
+        movie_id = int(movie_id)
+        if genre_id <= 0 or movie_id <= 0:
+            return False, "Genre ID and Movie ID must be positive integers"
+    except ValueError:
+        return False, "Genre ID and Movie ID must be valid integers"
+
     query = "DELETE FROM Belongs_to WHERE Genre_Genre_id = ? AND Movie_Movie_id = ?"
     return execute_query(query, (genre_id, movie_id))
 
 def delete_directed_by(movie_id, director_id):
     """delete director-movie relationship"""
+    # Validate inputs
+    try:
+        movie_id = int(movie_id)
+        director_id = int(director_id)
+        if movie_id <= 0 or director_id <= 0:
+            return False, "Movie ID and Director ID must be positive integers"
+    except ValueError:
+        return False, "Movie ID and Director ID must be valid integers"
+
     query = "DELETE FROM Directed_by WHERE Movie_Movie_id = ? AND Director_Director_id = ?"
     return execute_query(query, (movie_id, director_id))
 

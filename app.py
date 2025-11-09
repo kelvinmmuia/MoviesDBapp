@@ -224,27 +224,50 @@ def show_home():
             </div>
             """, unsafe_allow_html=True)
 
-def show_generic_add_form(table_name, field_labels, input_types, insert_func, field_types=None):
+def show_generic_add_form(table_name, field_labels, input_types, insert_func, field_types=None, placeholders=None):
     """generic form for adding data"""
     st.markdown(f"### ➕ Add New {table_name}")
     st.markdown("---")
+
+    # Define placeholders based on table and field
+    if placeholders is None:
+        placeholders = {}
+        for label in field_labels:
+            if "ID" in label:
+                placeholders[label] = f"e.g., 12345 (unique {label.lower()})"
+            elif "First Name" in label or "Last Name" in label:
+                placeholders[label] = f"e.g., John (max 45 chars)"
+            elif "Title" in label:
+                placeholders[label] = f"e.g., Movie Title (max 45 chars)"
+            elif "Email" in label:
+                placeholders[label] = f"e.g., user@example.com (max 45 chars)"
+            elif "Category" in label:
+                placeholders[label] = f"e.g., Action (max 45 chars)"
+            elif "Year" in label:
+                placeholders[label] = f"e.g., 2024 (1900-2030)"
+            elif "Rating" in label:
+                placeholders[label] = f"e.g., 85 (1-100)"
+            else:
+                placeholders[label] = f"Enter {label.lower()}"
 
     with st.form(f"add_{table_name.lower()}"):
         inputs = []
         field_types = field_types or ["text"] * len(field_labels)
 
         for i, (label, field_type) in enumerate(zip(field_labels, field_types)):
+            placeholder = placeholders.get(label, f"Enter {label.lower()}")
+
             if table_name == "Review" and label == "Rating":
                 # Special case for Review rating (slider)
                 inputs.append(st.slider(label, min_value=1, max_value=100, step=1, help="Rate from 1-100"))
             elif "ID" in label and field_type == "number":
-                inputs.append(st.number_input(label, min_value=1, step=1, help=f"Enter unique {label.lower()}"))
+                inputs.append(st.number_input(label, min_value=1, step=1, placeholder=placeholder, help=f"Enter unique {label.lower()}"))
             elif field_type == "text":
-                inputs.append(st.text_input(label, help=f"Enter {label.lower()}"))
+                inputs.append(st.text_input(label, placeholder=placeholder, help=f"Enter {label.lower()}"))
             elif field_type == "number":
-                inputs.append(st.number_input(label, min_value=1, step=1, help=f"Enter {label.lower()}"))
+                inputs.append(st.number_input(label, min_value=1, step=1, placeholder=placeholder, help=f"Enter {label.lower()}"))
             else:
-                inputs.append(st.text_input(label, help=f"Enter {label.lower()}"))
+                inputs.append(st.text_input(label, placeholder=placeholder, help=f"Enter {label.lower()}"))
 
         col1, col2, col3 = st.columns([1, 1, 2])
         with col1:
@@ -252,19 +275,37 @@ def show_generic_add_form(table_name, field_labels, input_types, insert_func, fi
 
         if submitted:
             if all(str(inp).strip() for inp in inputs if isinstance(inp, str)) and all(inp for inp in inputs if not isinstance(inp, str)):
-                if insert_func(*inputs):
-                    st.markdown(f"""
-                    <div class="success-message">
-                        ✅ <strong>{table_name} added successfully!</strong>
-                    </div>
-                    """, unsafe_allow_html=True)
-                    st.balloons()
+                result = insert_func(*inputs)
+                if isinstance(result, tuple):
+                    success, error_msg = result
+                    if success:
+                        st.markdown(f"""
+                        <div class="success-message">
+                            ✅ <strong>{table_name} added successfully!</strong>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        st.balloons()
+                    else:
+                        st.markdown(f"""
+                        <div class="error-message">
+                            ❌ <strong>Failed to add {table_name}:</strong> {error_msg}
+                        </div>
+                        """, unsafe_allow_html=True)
                 else:
-                    st.markdown(f"""
-                    <div class="error-message">
-                        ❌ <strong>Failed to add {table_name}.</strong> ID might already exist or database error occurred.
-                    </div>
-                    """, unsafe_allow_html=True)
+                    # Backward compatibility for functions that don't return error messages
+                    if result:
+                        st.markdown(f"""
+                        <div class="success-message">
+                            ✅ <strong>{table_name} added successfully!</strong>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        st.balloons()
+                    else:
+                        st.markdown(f"""
+                        <div class="error-message">
+                            ❌ <strong>Failed to add {table_name}.</strong> ID might already exist or database error occurred.
+                        </div>
+                        """, unsafe_allow_html=True)
             else:
                 st.markdown("""
                 <div class="warning-message">
@@ -298,10 +339,12 @@ def show_generic_delete_form(table_name, id_label, delete_func, is_text_id=False
             </div>
             """, unsafe_allow_html=True)
 
+        placeholder = f"e.g., 12345 (existing {id_label.lower()})" if not is_text_id else f"e.g., username (existing {id_label.lower()})"
+
         if is_text_id:
-            record_id = st.text_input(f"{id_label} to Delete", help=f"Enter the {id_label.lower()} of the record to delete")
+            record_id = st.text_input(f"{id_label} to Delete", placeholder=placeholder, help=f"Enter the {id_label.lower()} of the record to delete")
         else:
-            record_id = st.number_input(f"{id_label} to Delete", min_value=1, step=1, help=f"Enter the {id_label.lower()} of the record to delete")
+            record_id = st.number_input(f"{id_label} to Delete", min_value=1, step=1, placeholder=placeholder, help=f"Enter the {id_label.lower()} of the record to delete")
 
         col1, col2, col3 = st.columns([1, 1, 2])
         with col1:
@@ -309,21 +352,41 @@ def show_generic_delete_form(table_name, id_label, delete_func, is_text_id=False
 
         if submitted:
             if record_id:
-                if delete_func(record_id):
-                    st.markdown(f"""
-                    <div class="success-message">
-                        ✅ <strong>{table_name} with ID {record_id} deleted successfully!</strong>
-                    </div>
-                    """, unsafe_allow_html=True)
-                    st.balloons()
-                    time.sleep(1)  # Brief pause for user to see success message
-                    st.rerun()
+                result = delete_func(record_id)
+                if isinstance(result, tuple):
+                    success, error_msg = result
+                    if success:
+                        st.markdown(f"""
+                        <div class="success-message">
+                            ✅ <strong>{table_name} with ID {record_id} deleted successfully!</strong>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        st.balloons()
+                        time.sleep(1)  # Brief pause for user to see success message
+                        st.rerun()
+                    else:
+                        st.markdown(f"""
+                        <div class="error-message">
+                            ❌ <strong>Failed to delete {table_name}:</strong> {error_msg}
+                        </div>
+                        """, unsafe_allow_html=True)
                 else:
-                    st.markdown(f"""
-                    <div class="error-message">
-                        ❌ <strong>Failed to delete {table_name}.</strong> Record may not exist or has related records.
-                    </div>
-                    """, unsafe_allow_html=True)
+                    # Backward compatibility
+                    if result:
+                        st.markdown(f"""
+                        <div class="success-message">
+                            ✅ <strong>{table_name} with ID {record_id} deleted successfully!</strong>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        st.balloons()
+                        time.sleep(1)  # Brief pause for user to see success message
+                        st.rerun()
+                    else:
+                        st.markdown(f"""
+                        <div class="error-message">
+                            ❌ <strong>Failed to delete {table_name}.</strong> Record may not exist or has related records.
+                        </div>
+                        """, unsafe_allow_html=True)
             else:
                 st.markdown(f"""
                 <div class="warning-message">

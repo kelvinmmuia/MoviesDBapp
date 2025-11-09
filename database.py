@@ -107,28 +107,54 @@ def search_movies_by_genre(genre):
 
 def delete_actor(actor_id):
     """delete actor by id"""
-    query = "DELETE FROM Actor WHERE Actor_id = %s"
-    return execute_query(query, (actor_id,))
+    # First delete related records from junction tables
+    query1 = "DELETE FROM Acts_in WHERE Actor_Actor_id = %s"
+    execute_query(query1, (actor_id,))
+    # Then delete the actor
+    query2 = "DELETE FROM Actor WHERE Actor_id = %s"
+    return execute_query(query2, (actor_id,))
 
 def delete_director(director_id):
     """delete director by id"""
-    query = "DELETE FROM Director WHERE Director_id = %s"
-    return execute_query(query, (director_id,))
+    # First delete related records from junction tables
+    query1 = "DELETE FROM Directed_by WHERE Director_Director_id = %s"
+    execute_query(query1, (director_id,))
+    # Then delete the director
+    query2 = "DELETE FROM Director WHERE Director_id = %s"
+    return execute_query(query2, (director_id,))
 
 def delete_genre(genre_id):
     """delete genre by id"""
-    query = "DELETE FROM Genre WHERE Genre_id = %s"
-    return execute_query(query, (genre_id,))
+    # First delete related records from junction tables
+    query1 = "DELETE FROM Belongs_to WHERE Genre_Genre_id = %s"
+    execute_query(query1, (genre_id,))
+    # Then delete the genre
+    query2 = "DELETE FROM Genre WHERE Genre_id = %s"
+    return execute_query(query2, (genre_id,))
 
 def delete_movie(movie_id):
     """delete movie by id"""
-    query = "DELETE FROM Movie WHERE Movie_id = %s"
-    return execute_query(query, (movie_id,))
+    # First delete related records from junction tables
+    query1 = "DELETE FROM Acts_in WHERE Movie_Movie_id = %s"
+    execute_query(query1, (movie_id,))
+    query2 = "DELETE FROM Belongs_to WHERE Movie_Movie_id = %s"
+    execute_query(query2, (movie_id,))
+    query3 = "DELETE FROM Directed_by WHERE Movie_Movie_id = %s"
+    execute_query(query3, (movie_id,))
+    query4 = "DELETE FROM Review WHERE Movie_Movie_id = %s"
+    execute_query(query4, (movie_id,))
+    # Then delete the movie
+    query5 = "DELETE FROM Movie WHERE Movie_id = %s"
+    return execute_query(query5, (movie_id,))
 
 def delete_review(review_id):
     """delete review by id"""
-    query = "DELETE FROM Review WHERE Review_id = %s"
-    return execute_query(query, (review_id,))
+    # First delete related records from User table
+    query1 = "DELETE FROM User WHERE Review_Review_id = %s"
+    execute_query(query1, (review_id,))
+    # Then delete the review
+    query2 = "DELETE FROM Review WHERE Review_id = %s"
+    return execute_query(query2, (review_id,))
 
 def delete_user(user_id):
     """delete user by id"""

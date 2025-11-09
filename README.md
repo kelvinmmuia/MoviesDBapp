@@ -8,15 +8,15 @@ Access the deployed application at: [https://moviesdbapp.streamlit.app/](https:/
 
 ## ✨ Features
 
-- **🎭 Actor Management**: Add, view, and manage movie actors
-- **🎬 Director Management**: Handle film directors and their information
-- **🏷️ Genre Management**: Organize movies by genre categories
-- **🎪 Movie Database**: Complete movie catalog with titles and release years
-- **⭐ Review System**: Rate movies and track user reviews
-- **🔍 Advanced Search**: Search movies by title, year, actor, or genre
-- **📊 Data Visualization**: View all database tables with export options
-- **⚡ SQL Query Tool**: Execute custom SELECT queries safely
+- **🎭 Complete CRUD Operations**: Create, Read, Update, and Delete for all database entities
+- **➕ Add Data**: Insert new actors, directors, genres, movies, reviews, and users
+- **📝 Update Data**: Modify existing records with form validation
+- **🗑️ Delete Data**: Remove records with automatic relationship cleanup
+- **🔍 Advanced Search**: Find movies by title, year, actor, or genre
+- **📊 Data Visualization**: View all database tables with CSV export options
+- **⚡ SQL Query Tool**: Execute custom SELECT queries with security restrictions
 - **🔗 Relationship Management**: Link actors, directors, and genres to movies
+- **🎨 Professional UI**: Beautiful blue and gray theme with responsive design
 
 ## 🚀 Quick Start
 
@@ -61,15 +61,14 @@ Access the deployed application at: [https://moviesdbapp.streamlit.app/](https:/
 
 ```
 MoviesDBapp/
-├── app.py                    # Main Streamlit application
-├── database.py              # Database operations (SQLite)
-├── database_creation.py     # Database initialization script
-├── MovieDatabase.db         # SQLite database file
+├── app.py                    # Main Streamlit application with full CRUD operations
+├── database.py              # SQLite database operations and validation
+├── database_creation.py     # Database initialization with sample data
 ├── requirements.txt         # Python dependencies
 ├── .streamlit/
-│   └── config.toml         # Streamlit theme configuration
-├── .gitignore              # Git ignore rules
-└── README.md               # This file
+│   └── config.toml         # Professional blue & gray theme configuration
+├── .gitignore              # Git ignore rules (excludes .db, .sql files)
+└── README.md               # Project documentation
 ```
 
 ## 🛠️ Technology Stack
@@ -94,9 +93,11 @@ The application uses a relational database with the following tables:
 
 ## 🔒 Security Features
 
-- **Safe SQL Queries**: Only SELECT statements allowed in the query tool
-- **Input Validation**: Form validation and error handling
-- **No External Dependencies**: Self-contained SQLite database
+- **Safe SQL Queries**: Only SELECT statements allowed in the query tool (blocks DROP, DELETE, UPDATE, INSERT, ALTER, CREATE, TRUNCATE)
+- **Comprehensive Input Validation**: Type checking, range validation, length limits, and format validation
+- **Error Handling**: Detailed error messages guide users to correct inputs
+- **Self-contained Database**: SQLite with no external server dependencies
+- **Foreign Key Protection**: Automatic relationship cleanup during deletions
 
 ## 🤝 Contributing
 
@@ -110,11 +111,30 @@ The application uses a relational database with the following tables:
 
 This project is open source and available under the [MIT License](LICENSE).
 
+## 🎯 Learning Outcomes
+
+This project demonstrates:
+- **Full CRUD Operations**: Complete database management workflow
+- **Database Design**: Relational database schema with foreign keys
+- **UI/UX Design**: Professional web application development
+- **Data Validation**: Input sanitization and error handling
+- **SQL Security**: Safe query execution and injection prevention
+- **Deployment**: Cloud hosting and version control best practices
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
 ## 📞 Contact
 
 - **GitHub**: [kelvinmmuia](https://github.com/kelvinmmuia)
 - **Live App**: [https://moviesdbapp.streamlit.app/](https://moviesdbapp.streamlit.app/)
+- **LinkedIn**: [Your LinkedIn Profile]
 
 ---
 
-**Built with ❤️ using Streamlit**
+**🎬 Built with ❤️ using Streamlit - Perfect for learning database management and web app development!**

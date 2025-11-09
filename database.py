@@ -1,29 +1,25 @@
 # database operations
 
-import mysql.connector
+import sqlite3
 import os
-from dotenv import load_dotenv
+from pathlib import Path
 
-load_dotenv()
-
-DB_CONFIG = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': os.getenv('MYSQL_ROOT_PASSWORD', ''),
-    'database': 'MovieDatabase'
-}
+# Use SQLite database file
+DB_PATH = Path(__file__).parent / 'MovieDatabase.db'
 
 def get_connection():
-    return mysql.connector.connect(**DB_CONFIG)
+    return sqlite3.connect(DB_PATH)
 
 def execute_query(query, params=None):
     with get_connection() as conn:
-        with conn.cursor(dictionary=True) as cursor:
-            cursor.execute(query, params or ())
-            if query.strip().upper().startswith('SELECT'):
-                return cursor.fetchall()
-            conn.commit()
-            return True
+        cursor = conn.cursor()
+        cursor.execute(query, params or ())
+        if query.strip().upper().startswith('SELECT'):
+            columns = [desc[0] for desc in cursor.description] if cursor.description else []
+            rows = cursor.fetchall()
+            return [dict(zip(columns, row)) for row in rows]
+        conn.commit()
+        return True
 
 def get_table_data(table_name):
     """get all data from a table"""

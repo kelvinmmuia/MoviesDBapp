@@ -159,7 +159,7 @@ def show_home():
     """show home page"""
     st.markdown("""
     <div class="welcome-section">
-        <h2 style="color: #2962FF; margin-bottom: 1rem;">🎯 Welcome to Movie Database System</h2>
+        <h2 style="color: #2962FF; margin-bottom: 1rem;">Welcome to Movie Database System</h2>
         <p style="font-size: 1.1rem; color: #31333F; margin-bottom: 1.5rem;">
             This is a comprehensive movie database management system built with Streamlit and MySQL.
         </p>

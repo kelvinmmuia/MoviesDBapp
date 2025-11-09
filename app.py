@@ -161,7 +161,7 @@ def show_home():
     <div class="welcome-section">
         <h2 style="color: #2962FF; margin-bottom: 1rem;">Welcome to Movie Database System</h2>
         <p style="font-size: 1.1rem; color: #31333F; margin-bottom: 1.5rem;">
-            This is a comprehensive movie database management system built with Streamlit and MySQL.
+            This is a comprehensive movie database management system built with Streamlit and SQLite.
         </p>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
             <div style="background: white; padding: 1rem; border-radius: 8px; border-left: 4px solid #2962FF;">

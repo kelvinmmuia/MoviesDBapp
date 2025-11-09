@@ -131,7 +131,7 @@ def main():
         "🏠 Home": "Home",
         "➕ Add Data": "Add Data",
         "📝 Update Data": "Update Data",
-        "️ Delete Data": "Delete Data",
+        "🗑️ Delete Data": "Delete Data",
         "🔍 Search Movies": "Search Movies",
         "📊 View Data": "View Data",
         "⚡ SQL Query Tool": "SQL Query Tool"

@@ -11,15 +11,19 @@ def get_connection():
     return sqlite3.connect(DB_PATH)
 
 def execute_query(query, params=None):
-    with get_connection() as conn:
-        cursor = conn.cursor()
-        cursor.execute(query, params or ())
-        if query.strip().upper().startswith('SELECT'):
-            columns = [desc[0] for desc in cursor.description] if cursor.description else []
-            rows = cursor.fetchall()
-            return [dict(zip(columns, row)) for row in rows]
-        conn.commit()
-        return True
+    try:
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, params or ())
+            if query.strip().upper().startswith('SELECT'):
+                columns = [desc[0] for desc in cursor.description] if cursor.description else []
+                rows = cursor.fetchall()
+                return [dict(zip(columns, row)) for row in rows]
+            conn.commit()
+            return True
+    except Exception as e:
+        print(f"Database error: {e}")
+        return None
 
 def get_table_data(table_name):
     """get all data from a table"""
